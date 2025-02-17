@@ -3,42 +3,6 @@
 import { hash, verify } from "argon2";
 import User from "../models/User.js";
 
-// Crear usuario
-export const createUser = async (req, res) => {
-  try {
-    const { name, surname, username, password, email, phone, role } = req.body;
-
-    // Encriptar la contraseña
-    const hashedPassword = await hash(password);
-
-    // Crear nuevo usuario
-    const newUser = new User({
-      name,
-      surname,
-      username,
-      password: hashedPassword,
-      email,
-      phone,
-      role,
-    });
-
-    // Guardar en la base de datos
-    await newUser.save();
-
-    return res.status(201).json({
-      success: true,
-      message: "Usuario creado exitosamente",
-      user: newUser,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: "Error al crear el usuario",
-      error: err.message,
-    });
-  }
-};
-
 // Obtener usuario por ID
 export const getUserById = async (req, res) => {
   try {
@@ -73,7 +37,9 @@ export const getUsers = async (req, res) => {
 
     const [total, users] = await Promise.all([
       User.countDocuments(query),
-      User.find(query).skip(Number(from)).limit(Number(limit)),
+      User.find(query)
+      .skip(Number(from))
+      .limit(Number(limit)),
     ]);
 
     return res.status(200).json({
